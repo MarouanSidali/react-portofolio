@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader';
 
-const ThreeDModelViewer = ({ modelPath }) => {
+const ThreeScene = ({ modelPath }) => {
   useEffect(() => {
     // Set up scene
     const scene = new THREE.Scene();
@@ -26,8 +26,9 @@ const ThreeDModelViewer = ({ modelPath }) => {
         scene.add(gltf.scene);
       },
       (xhr) => {
-        // Optional: Log loading progress
-        console.log('Loading progress:', (xhr.loaded / xhr.total) * 100 + '%');
+        // Check if xhr.total is greater than 0 before calculating progress
+        const progress = xhr.total > 0 ? (xhr.loaded / xhr.total) * 100 : 0;
+        console.log(`Loaded ${xhr.loaded} bytes of ${xhr.total} bytes. Loading progress: ${progress.toFixed(2)}%`);
       },
       (error) => {
         // Log and handle loading errors
@@ -66,4 +67,4 @@ const ThreeDModelViewer = ({ modelPath }) => {
   return null; // No need to render anything in the component itself
 };
 
-export default ThreeDModelViewer;
+export default ThreeScene;
