@@ -1,48 +1,69 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader';
 
-const ThreeScene = () => {
+const ThreeDModelViewer = ({ modelPath }) => {
   useEffect(() => {
-    // Create a scene
+    // Set up scene
     const scene = new THREE.Scene();
 
-    // Create a camera
+    // Set up camera
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
 
-    // Create a renderer
+    // Set up renderer
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('three-container').appendChild(renderer.domElement);
+    document.body.appendChild(renderer.domElement);
 
-    // Your Three.js code for loading and animating the Blender animation goes here
+    // Load 3D model
     const loader = new GLTFLoader();
 
-    loader.load('../models/jupyter.glb', (gltf) => {
-      const mixer = new THREE.AnimationMixer(gltf.scene);
-      const action = mixer.clipAction(gltf.animations[0]);
-      action.play();
+    loader.load(
+      modelPath,
+      (gltf) => {
+        // Add the loaded model to the scene
+        scene.add(gltf.scene);
+      },
+      (xhr) => {
+        // Optional: Log loading progress
+        console.log('Loading progress:', (xhr.loaded / xhr.total) * 100 + '%');
+      },
+      (error) => {
+        // Log and handle loading errors
+        console.error('Error loading 3D model:', error);
+      }
+    );
 
-      scene.add(gltf.scene);
+    // Animation loop
+    const animate = () => {
+      requestAnimationFrame(animate);
 
-      const animate = () => {
-        requestAnimationFrame(animate);
-        mixer.update(0.01); // Adjust the time delta as needed
-        renderer.render(scene, camera);
-      };
+      // Update animations or other dynamic elements here
 
-      animate();
+      // Render the scene with the camera
+      renderer.render(scene, camera);
+    };
 
-      // Cleanup function
-      return () => {
-        // Dispose of resources when the component is unmounted
-        mixer.stopAllAction();
-      };
-    });
-  }, []); // Empty dependency array to ensure useEffect runs only once
+    animate();
 
-  return <div id="three-container" />;
+    // Handle window resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      // Add any additional cleanup logic as needed
+    };
+  }, [modelPath]);
+
+  return null; // No need to render anything in the component itself
 };
 
-export default ThreeScene;
+export default ThreeDModelViewer;

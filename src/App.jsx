@@ -46,7 +46,7 @@ function App() {
           <Route path="/skills" element={<Skills />}></Route>
           <Route path="/projects" element={<Projects />}></Route>
           <Route path="/contact" element={<Contact />}></Route>
-          <Route path="/three-scene" element={<ThreeScene />} />
+          <Route path="/three-scene" element={<ThreeScene modelPath="./models/jupyter.glb" />} />
         </Routes>
       </div>
       <Footer />
